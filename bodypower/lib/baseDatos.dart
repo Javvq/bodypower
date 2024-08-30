@@ -14,31 +14,60 @@ class DatabaseHelper {
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'exercises.db');
-    return openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
+ Future<Database> _initDatabase() async {
+  final dbPath = await getDatabasesPath();
+  final path = join(dbPath, 'exercises.db');
+  return openDatabase(
+    path,
+    version: 2, // Incrementa la versión aquí
+    onCreate: (db, version) async {
+      await db.execute('''
+        CREATE TABLE exercises (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT,
+          description TEXT,
+          difficulty TEXT
+        )
+      ''');
+    },
+    onUpgrade: (db, oldVersion, newVersion) async {
+      if (oldVersion < 2) {
         await db.execute('''
-          CREATE TABLE exercises (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            description TEXT
-          )
+          ALTER TABLE exercises ADD COLUMN difficulty TEXT
         ''');
-      },
-    );
-  }
+      }
+    },
+  );
+}
+
+
 
   Future<int> insertExercise(Map<String, dynamic> exercise) async {
     final db = await database;
     return db.insert('exercises', exercise);
   }
+Future<int> deleteExercise(int id) async {
+  final db = await database;
+  return db.delete(
+    'exercises',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+}
 
-  Future<List<Map<String, dynamic>>> getExercises() async {
-    final db = await database;
+ Future<List<Map<String, dynamic>>> getExercises({String? difficulty}) async {
+  final db = await database;
+  if (difficulty != null) {
+    return db.query(
+      'exercises',
+      where: 'difficulty = ?',
+      whereArgs: [difficulty],
+    );
+  } else {
     return db.query('exercises');
   }
+}
+
+  getExercisesByDifficulty(String difficulty) {}
+
 }

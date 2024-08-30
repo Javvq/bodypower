@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'baseDatos.dart';
 
 class ExercisesScreen extends StatefulWidget {
+  final String difficulty; // Agrega este campo para recibir la dificultad
+
+  ExercisesScreen({required this.difficulty}); // Asegúrate de que el constructor acepte este parámetro
+
   @override
   _ExercisesScreenState createState() => _ExercisesScreenState();
 }
@@ -9,7 +13,6 @@ class ExercisesScreen extends StatefulWidget {
 class _ExercisesScreenState extends State<ExercisesScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  String _selectedDifficulty = 'Principiante'; // Valor inicial
   final dbHelper = DatabaseHelper();
 
   Future<void> _addExercise() async {
@@ -20,7 +23,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
       await dbHelper.insertExercise({
         'name': name,
         'description': description,
-        'difficulty': _selectedDifficulty, // Añadir dificultad
+        'difficulty': widget.difficulty, // Usa el parámetro difficulty aquí
       });
       _nameController.clear();
       _descriptionController.clear();
@@ -28,16 +31,11 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
     }
   }
 
-  Future<void> _deleteExercise(int id) async {
-    await dbHelper.deleteExercise(id);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registrar Ejercicios'),
+        title: Text('Ejercicios (${widget.difficulty})'), // Muestra la dificultad en el título
       ),
       body: Column(
         children: [
@@ -55,31 +53,13 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
               decoration: InputDecoration(labelText: 'Descripción'),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<String>(
-              value: _selectedDifficulty,
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedDifficulty = newValue!;
-                });
-              },
-              items: <String>['Principiante', 'Intermedio', 'Avanzado']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-          ),
           ElevatedButton(
             onPressed: _addExercise,
             child: Text('Añadir Ejercicio'),
           ),
           Expanded(
             child: FutureBuilder<List<Map<String, dynamic>>>(
-              future: dbHelper.getExercises(),
+              future: dbHelper.getExercisesByDifficulty(widget.difficulty), // Obtén los ejercicios por dificultad
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
@@ -95,14 +75,7 @@ class _ExercisesScreenState extends State<ExercisesScreen> {
                       final exercise = exercises[index];
                       return ListTile(
                         title: Text(exercise['name']),
-                        subtitle: Text(
-                            '${exercise['description']} - Dificultad: ${exercise['difficulty']}'),
-                        trailing: IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            _deleteExercise(exercise['id']);
-                          },
-                        ),
+                        subtitle: Text(exercise['description']),
                       );
                     },
                   );
