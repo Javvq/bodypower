@@ -21,13 +21,15 @@ class DatabaseHelper {
       path,
       version: 1,
       onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE exercises (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            description TEXT
-          )
-        ''');
+       await db.execute('''
+  CREATE TABLE exercises (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    description TEXT,
+    difficulty TEXT
+  )
+''');
+
       },
     );
   }
@@ -41,4 +43,9 @@ class DatabaseHelper {
     final db = await database;
     return db.query('exercises');
   }
+  Future<List<Map<String, dynamic>>> getExercisesByDifficulty(String difficulty) async {
+  final db = await database;
+  return db.query('exercises', where: 'difficulty = ?', whereArgs: [difficulty]);
+}
+
 }
