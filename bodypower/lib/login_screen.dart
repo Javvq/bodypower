@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'admin_screen.dart'; // Asegúrate de tener esta importación si estás redirigiendo a AdminScreen
-import 'user_screen.dart'; // Asegúrate de tener esta importación si estás redirigiendo a UserScreen
+import 'admin_screen.dart'; 
+import 'user_screen.dart';
+import 'homescreen.dart'; // Asegúrate de tener esta importación si rediriges a HomeScreen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -21,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/login'), // Cambia esto según tu URL de backend
+        Uri.parse('http://localhost:3000/login'), 
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -37,9 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('userRole', role);
-        await prefs.setString('userToken', ''); // Opcional: Guarda el token si lo usas
+        await prefs.setString('userToken', ''); // Guarda el token si lo usas
 
-        // Redirigir a la pantalla correspondiente según el rol
+        // Redirige a la pantalla correspondiente según el rol
         if (role == 'admin') {
           Navigator.pushReplacement(
             context,

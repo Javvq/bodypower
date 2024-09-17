@@ -16,7 +16,9 @@ class AdminScreen extends StatelessWidget {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.remove('userRole');
               await prefs.remove('userToken');
-              Navigator.pushReplacementNamed(context, '/login'); // Redirige a la pantalla de login
+              
+              // Redirige al login y elimina las rutas anteriores en el stack de navegación
+              Navigator.pushNamedAndRemoveUntil(context, '/login', (Route<dynamic> route) => false);
             },
           ),
         ],
@@ -44,7 +46,7 @@ class _AdminBodyState extends State<AdminBody> {
   Future<void> _fetchUsers() async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:3001/users'), // Cambia esto según tu URL de backend
+        Uri.parse('http://localhost:3000/users/get'),
       );
 
       if (response.statusCode == 200) {
@@ -66,7 +68,9 @@ class _AdminBodyState extends State<AdminBody> {
   Future<void> _createUser(BuildContext context) async {
     final TextEditingController _nameController = TextEditingController();
     final TextEditingController _passwordController = TextEditingController();
-    String? _selectedRole = 'user'; // Valor predeterminado para el rol
+    String? _selectedRole = 'user'; 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userRole = prefs.getString('userRole') ?? 'user'; 
 
     showDialog(
       context: context,
@@ -110,29 +114,28 @@ class _AdminBodyState extends State<AdminBody> {
 
                 try {
                   final response = await http.post(
-                    Uri.parse('http://localhost:3001/users'),
+                    Uri.parse('http://localhost:3000/users'),
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
                     },
                     body: jsonEncode(<String, String>{
                       'nombre': name,
                       'password': password,
-                      'rol': _selectedRole ?? 'user', // Usa el rol seleccionado o predeterminado
+                      'rol': _selectedRole ?? 'user', 
+                      'adminRole' :  userRole,
                     }),
                   );
 
-                  // Imprime la respuesta del servidor para depuración
                   print('Response status: ${response.statusCode}');
                   print('Response body: ${response.body}');
 
                   if (response.statusCode == 200) {
                     Navigator.of(context).pop();
-                    _fetchUsers(); // Refresca la lista de usuarios
+                    _fetchUsers(); 
                   } else {
                     throw Exception('Error al crear usuario: ${response.body}');
                   }
                 } catch (e) {
-                  // Manejo de errores
                   setState(() {
                     _errorMessage = 'Error al crear el usuario. Inténtalo de nuevo.';
                   });
@@ -153,11 +156,10 @@ class _AdminBodyState extends State<AdminBody> {
     );
   }
 
-
   Future<void> _createExercise(BuildContext context) async {
     final TextEditingController _nameController = TextEditingController();
     final TextEditingController _descriptionController = TextEditingController();
-    String? _selectedDifficulty = 'Principiante'; // Valor predeterminado para la dificultad
+    String? _selectedDifficulty = 'Principiante'; 
 
     showDialog(
       context: context,
@@ -207,18 +209,16 @@ class _AdminBodyState extends State<AdminBody> {
                     body: jsonEncode(<String, String>{
                       'name': name,
                       'description': description,
-                      'difficulty': _selectedDifficulty ?? 'Principiante', // Usa la dificultad seleccionada o predeterminada
+                      'difficulty': _selectedDifficulty ?? 'Principiante',
                     }),
                   );
 
                   if (response.statusCode == 200) {
                     Navigator.of(context).pop();
-                    // Puedes agregar un método para refrescar la lista de ejercicios si es necesario
                   } else {
                     throw Exception('Error al registrar ejercicio');
                   }
                 } catch (e) {
-                  // Manejo de errores
                   print('Error: $e');
                 }
               },
@@ -281,6 +281,3 @@ class _AdminBodyState extends State<AdminBody> {
     );
   }
 }
-
-
-
