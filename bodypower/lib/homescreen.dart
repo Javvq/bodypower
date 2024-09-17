@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'exercises_screen.dart'; // Asegúrate de importar este archivo
-import 'days_list_screen.dart'; // Asegúrate de importar este archivo
+import 'exercises_screen.dart';
+import 'days_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -28,7 +28,9 @@ class HomeScreen extends StatelessWidget {
               width: 200,
               height: 100,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.blueAccent),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent, // Cambia 'primary' a 'backgroundColor'
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -46,7 +48,9 @@ class HomeScreen extends StatelessWidget {
               width: 200,
               height: 100,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.greenAccent),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.greenAccent, // Cambia 'primary' a 'backgroundColor'
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -64,7 +68,9 @@ class HomeScreen extends StatelessWidget {
               width: 200,
               height: 100,
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(primary: Colors.redAccent),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,

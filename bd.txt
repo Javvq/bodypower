@@ -1,0 +1,25 @@
+CREATE DATABASE bodypower;
+USE bodypower;
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,       
+  nombre VARCHAR(50) NOT NULL UNIQUE,     
+  password VARCHAR(255) NOT NULL,
+  rol ENUM ("admin", "user") NOT NULL
+  
+);
+CREATE TABLE exercises (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  difficulty ENUM('Principiante', 'Intermedio', 'Experimentado') NOT NULL
+);
+
+
+
+select * from exercises;
+select * from users;
+INSERT INTO users (nombre, password, rol) 
+VALUES ('usuarioEjemplo', 'contrasenaSegura', 'user');
+INSERT INTO users (nombre, password, rol) 
+VALUES ('Pablo', '123', 'admin');
+
